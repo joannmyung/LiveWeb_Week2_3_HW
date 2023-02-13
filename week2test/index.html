@@ -1,0 +1,85 @@
+<html>
+	<head>
+		<link rel="stylesheet" href="style.css">
+		<script type="text/javascript" src="/socket.io/socket.io.js"></script>
+		<script type="text/javascript">
+		
+			var socket = io.connect();
+			socket.on('connect', function() {
+				console.log("Connected");
+			});
+
+			// Receive from any event
+			socket.on('chatmessage', function (data) {
+				console.log(data);
+				//ㅇ여기ㅣㅣ
+				let newmessage = document.createElement("DIV");
+                //("") -> what kind of element it is . In the quote, whatever your element you want to be. ex) ("DIV")
+                newmessage.innerHTML = data;
+                // text that will be inside of this DIV is the chat message that ocmes in 
+
+                //newmessage.style
+                // add class for certian styling 
+
+                // document.getElementById('messages').appendChild(newmessage)
+                //add it to page. appendchild -> how to add one element to another pre-existing elment
+
+                //-> now there is DIV for each one of these messages that comes in 
+
+                //parent child element for elements that are inside of other elements -> DIV, inside of the DIV there is another DIV
+                
+
+                //이까
+				// document.getElementById('messages').innerHTML =  document.getElementById('messages').innerHTML  + data + "<br>";
+				document.getElementById('messages').innerHTML =  document.getElementById('messages').innerHTML  + `
+						<div class="message-row.theirs">
+							<div class="bubble">${data}</div>
+						</div>` + "<br>";
+			});
+
+			var sendmessage = function(message) {
+				console.log("chatmessage: " + message);
+				socket.emit('chatmessage', message);
+			};
+
+			
+
+		</script>
+		<h2 class="glowing-text">Let's Chat!</h2>
+	</head>
+ <body>
+	<div id="messages"></div>
+
+<form>
+	<input type="text" placeholder="Your message..." id="message" name="message">
+ 	<input type="submit" value="submit" onclick="sendmessage(document.getElementById('message').value);">
+</form>
+
+<!-- added -->
+<!-- not showing blue bubble -->
+<script>
+	function showMessage(text, isMine = false) {
+	  document.getElementById("messages").innerHTML +=  `
+		<div class="message-row ${isMine?'mine':'theirs'}">
+			<div class="bubble2">${text}</div>
+		</div>
+	  `;
+	}
+	const ws = new WebSocket('ws://localhost:8080');
+	// ws.addEventListener('message', ev => {
+	//   ev.data.text().then(showMessage);
+	// });
+	//eventobject
+	document.querySelector('form').onsubmit = ev => {
+		//not send input information "text" as a default, to send to web socket -> preventdefault
+	  ev.preventDefault();
+	  const input = document.querySelector('input');
+	  ws.send(input.value);
+	  showMessage(input.value, true);
+	  input.value = '';
+	}
+</script>
+
+
+ </body>
+</html>
